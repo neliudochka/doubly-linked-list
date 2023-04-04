@@ -14,12 +14,12 @@ func main() {
 	ddl2.Append('3')
 	ddl2.Append('4')
 	ddl2.Append('5')
-	ddl2.Append('6')
+	ddl2.Append('m')
 
 	ddl2.PrintAll()
 	fmt.Println("len: ", ddl2.Lenght())
 
-	ddl3 := ddl2.Clone()
+	ddl3, _ := ddl2.Clone()
 
 	ddl3.Append('y')
 

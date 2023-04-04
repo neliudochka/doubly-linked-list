@@ -46,7 +46,7 @@ func (dll *DoublyLinkedList) Lenght() int {
 }
 
 // Додає елемент у кінець списку
-func (dll *DoublyLinkedList) Append(element rune) {
+func (dll *DoublyLinkedList) Append(element rune) error {
 	var newNode = Node{value: element}
 	if dll.head == nil {
 		dll.head = &newNode
@@ -57,12 +57,13 @@ func (dll *DoublyLinkedList) Append(element rune) {
 		dll.tail = &newNode
 	}
 	dll.size++
+	return nil
 }
 
 // Вставляє елемент на довільну позицію у списку.
 // У випадку передачі некоректного значення позиції
 // (наприклад, від’ємне число, або число, більше за кількість елементів у списку) генерує виключну ситуацію
-func (dll *DoublyLinkedList) Insert(element rune, index int) {
+func (dll *DoublyLinkedList) Insert(element rune, index int) error {
 	switch {
 	case index < 0:
 		fmt.Println("Error: index < 0")
@@ -84,13 +85,14 @@ func (dll *DoublyLinkedList) Insert(element rune, index int) {
 		nextNode.prev = &newNode
 		dll.size++
 	}
+	return nil
 }
 
 // Видаляє елемент зі списку на вказаній позиції.
 // Повертає значення того елементу, який видаляється.
 // У випадку передачі некоректного значення позиції
 // (наприклад, від’ємне число, або число, більше за індекс останнього елементу списку) метод повинен генерувати виключну ситуацію
-func (dll *DoublyLinkedList) Delete(index int) rune {
+func (dll *DoublyLinkedList) Delete(index int) (rune, error) {
 	switch {
 	case index < 0:
 		fmt.Println("Error: index < 0")
@@ -101,19 +103,19 @@ func (dll *DoublyLinkedList) Delete(index int) rune {
 		dll.head = nil
 		dll.tail = nil
 		dll.size--
-		return element
+		return element, nil
 	case index == 0:
 		element := dll.head.value
 		dll.head = dll.head.next
 		dll.head.prev = nil
 		dll.size--
-		return element
+		return element, nil
 	case index == dll.size-1:
 		element := dll.tail.value
 		dll.tail = dll.tail.prev
 		dll.tail.next = nil
 		dll.size--
-		return element
+		return element, nil
 	default:
 		delNode := dll.head
 		for count := 0; count != index; count++ {
@@ -122,14 +124,14 @@ func (dll *DoublyLinkedList) Delete(index int) rune {
 		delNode.prev.next = delNode.next
 		delNode.next.prev = delNode.prev
 		dll.size--
-		return delNode.value
+		return delNode.value, nil
 	}
-	return 0
+	return 0, nil
 }
 
 // Видаляєя зі списку усі елементи, які за значенням відповідають переданому.
 // У випадку передачі елемента, який у списку відсутній, жодні зміни до списку не застосовуються.
-func (dll *DoublyLinkedList) DeleteAll(element rune) {
+func (dll *DoublyLinkedList) DeleteAll(element rune) error {
 	currentNode := dll.head
 	count := 0
 	for currentNode != nil {
@@ -141,12 +143,13 @@ func (dll *DoublyLinkedList) DeleteAll(element rune) {
 		}
 		currentNode = nextNode
 	}
+	return nil
 }
 
 // Отримує елемент списку з довільної позиції
 // У випадку передачі некоректного значення позиції
 // (наприклад, від’ємне число, або число, більше за індекс останнього елементу списку) метод повинен генерувати виключну ситуацію
-func (dll *DoublyLinkedList) Get(index int) rune {
+func (dll *DoublyLinkedList) Get(index int) (rune, error) {
 	switch {
 	case index < 0:
 		fmt.Println("Error: index < 0")
@@ -157,25 +160,25 @@ func (dll *DoublyLinkedList) Get(index int) rune {
 		for count := 0; count != index; count++ {
 			currentNode = currentNode.next
 		}
-		return currentNode.value
+		return currentNode.value, nil
 	}
-	return 0
+	return 0, nil
 }
 
-// Копіює поточний список та повернутає його копію.
-func (dll *DoublyLinkedList) Clone() DoublyLinkedList {
+// Копіює поточний список та повертає його копію.
+func (dll *DoublyLinkedList) Clone() (DoublyLinkedList, error) {
 	dll2 := DoublyLinkedList{}
 	currentNode := dll.head
 	for currentNode != nil {
 		dll2.Append(currentNode.value)
 		currentNode = currentNode.next
 	}
-	return dll2
+	return dll2, nil
 }
 
 // Змінює порядок елементів у поточному списку задом наперед.
 // Елемент, що був останнім стане першим, передостаннім — другим, … а перший — останнім.
-func (dll *DoublyLinkedList) Reverse() {
+func (dll *DoublyLinkedList) Reverse() error {
 	switch {
 	case dll.size > 1:
 		//tailNode := dll.tail
@@ -194,40 +197,41 @@ func (dll *DoublyLinkedList) Reverse() {
 	default:
 		fmt.Println("List is empty!")
 	}
+	return nil
 }
 
 // Шукає переданий елемент з голови списку. Повертає перший знайдений, що дорівнює шуканому, та повертає його позицію.
 // У випадку відсутності шуканого елемента у списку, метод повертає -1
-func (dll *DoublyLinkedList) FindFirst(element rune) int {
+func (dll *DoublyLinkedList) FindFirst(element rune) (int, error) {
 	currentNode := dll.head
 	count := 0
 	for currentNode != nil {
 		if currentNode.value == element {
-			return count
+			return count, nil
 		}
 		count++
 		currentNode = currentNode.next
 	}
-	return -1
+	return -1, nil
 }
 
 // Шукає переданий елемент з хвоста списку. Повертає перший знайдений, що дорівнює шуканому, та повертає його позицію.
 // У випадку відсутності шуканого елемента у списку, метод повертає -1
-func (dll *DoublyLinkedList) FindLast(element rune) int {
+func (dll *DoublyLinkedList) FindLast(element rune) (int, error) {
 	currentNode := dll.tail
 	count := dll.size - 1
 	for currentNode != nil {
 		if currentNode.value == element {
-			return count
+			return count, nil
 		}
 		count--
 		currentNode = currentNode.prev
 	}
-	return -1
+	return -1, nil
 }
 
 // Видаляє усі елементи списку.
-func (dll *DoublyLinkedList) Clear() {
+func (dll *DoublyLinkedList) Clear() error {
 	if dll.size > 0 {
 		dll.head = nil
 		dll.tail = nil
@@ -235,16 +239,18 @@ func (dll *DoublyLinkedList) Clear() {
 	} else {
 		fmt.Println("List is empty!")
 	}
+	return nil
 }
 
 // Розширює список.
 // Приймає інший список та додає до поточного списку усі елементи останнього.
 // При цьому подальші зміни в другий список не впливають на перший.
-func (dll *DoublyLinkedList) Extend(dll2 DoublyLinkedList) {
-	newDll := dll2.Clone()
+func (dll *DoublyLinkedList) Extend(dll2 DoublyLinkedList) error {
+	newDll, _ := dll2.Clone()
 	fmt.Println("clone:")
 	newDll.PrintAll()
 	dll.tail.next = newDll.head
 	newDll.head.prev = dll.tail
 	dll.tail = newDll.tail
+	return nil
 }
