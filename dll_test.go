@@ -1,7 +1,6 @@
 package dll
 
 import (
-	"fmt"
 	"testing"
 )
 
@@ -33,20 +32,16 @@ func TestLenght(t *testing.T) {
 func TestAppend(t *testing.T) {
 	t.Run("Expect size of the non-empty list to increase by 1 after adding the element", func(t *testing.T) {
 		dll := DoublyLinkedList{}
-		err := dll.Append('B')
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
-		if dll.Lenght() != 1 {
-			t.Errorf("Expected size: 1, got %v", dll.Lenght())
-		}
 
-		err = dll.Append('s')
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
-		if dll.Lenght() != 2 {
-			t.Errorf("Expected size: 2, got %v", dll.Lenght())
+		for i := 0; i < 2; i++ {
+			oldLen := dll.Lenght()
+			err := dll.Append('B')
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+			if dll.Lenght() != oldLen+1 {
+				t.Errorf("Expected size: %v, got %v", oldLen+1, dll.Lenght())
+			}
 		}
 	})
 
@@ -116,38 +111,6 @@ func TestInsert(t *testing.T) {
 		}
 	})
 
-	t.Run("Expect method to insert element at the end of a non-empty list", func(t *testing.T) {
-		dll := DoublyLinkedList{}
-		l := 'ґ'
-		l2 := 'м'
-		dll.Insert(l, 0)
-		dll.Insert(l, 0)
-		err := dll.Insert(l2, 2)
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
-		char, _ := dll.Get(2)
-		if char != l2 {
-			t.Errorf("Expected %c, got %v", l, char)
-		}
-	})
-
-	t.Run("Expect method to insert element in the middle of a non-empty list", func(t *testing.T) {
-		dll := DoublyLinkedList{}
-		l := 'ґ'
-		l2 := 'м'
-		dll.Insert(l, 0)
-		dll.Insert(l, 0)
-		err := dll.Insert(l2, 1)
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
-		char, _ := dll.Get(1)
-		if char != l2 {
-			t.Errorf("Expected %c, got %v", l, char)
-		}
-	})
-
 	t.Run("Expect method to return an error for non-letter arguments", func(t *testing.T) {
 		dll := DoublyLinkedList{}
 		n := '9'
@@ -157,43 +120,27 @@ func TestInsert(t *testing.T) {
 		}
 	})
 
-	//size check
-	t.Run("Expect size of the non-empty list to increase by 1 after inserting the element", func(t *testing.T) {
+	t.Run("Expect size of list to increase by 1 after inserting the elements", func(t *testing.T) {
 		dll := DoublyLinkedList{}
-		err := dll.Insert('B', 0)
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
-		if dll.Lenght() != 1 {
-			t.Errorf("the first one\nExpected size: 1, got %v", dll.Lenght())
-		}
-
-		err = dll.Insert('c', 1)
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
-		if dll.Lenght() != 2 {
-			t.Errorf("at the end\nExpected size: 2, got %v", dll.Lenght())
+		tests := []testCase{
+			{0, 'B'},
+			{1, 'c'},
+			{0, 'a'},
+			{1, 'd'},
 		}
 
-		err = dll.Insert('a', 0)
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
-		if dll.Lenght() != 3 {
-			t.Errorf("at the begining\nExpected size: 3, got %v", dll.Lenght())
-		}
-
-		err = dll.Insert('d', 1)
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
-		if dll.Lenght() != 4 {
-			t.Errorf("in the middle\nExpected size: 4, got %v", dll.Lenght())
+		for _, test := range tests {
+			oldLen := dll.Lenght()
+			err := dll.Insert(test.val, test.index)
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+			if dll.Lenght() != oldLen+1 {
+				t.Errorf("Expected size: %v, got %v", oldLen+1, dll.Lenght())
+			}
 		}
 	})
 
-	//index check
 	t.Run("Expect method to return an error for wrong index argument: index < 0", func(t *testing.T) {
 		dll := DoublyLinkedList{}
 		index := -1
@@ -207,7 +154,6 @@ func TestInsert(t *testing.T) {
 	t.Run("Expect method to return an error for wrong index argument: index > size of the list", func(t *testing.T) {
 		dll := DoublyLinkedList{}
 		l := 'f'
-
 		err := dll.Insert(l, 1)
 		if err == nil {
 			t.Errorf("Expected method to return an error, got %v", err)
@@ -223,24 +169,20 @@ func TestInsert(t *testing.T) {
 	})
 }
 
-// preparing DoublyLinkedList with lowercase letters in alphabetical order
-// reruns created DoublyLinkedList and the first element
-func prepareList(count int) (*DoublyLinkedList, rune, error) {
-	if count > 26 {
-		return nil, 0, fmt.Errorf("prepareList: there are only 26 letters in the English alphabet")
-	}
+// preparing DoublyLinkedList for TestDelete func
+func prepareListForDeleteM() *DoublyLinkedList {
 	dll := DoublyLinkedList{}
 	l1 := 'a'
-	for i := 0; i < count; i++ {
+	for i := 0; i < 4; i++ {
 		newL := rune(int(l1) + i)
 		dll.Append(newL)
 	}
-	return &dll, l1, nil
+	return &dll
 }
 func TestDelete(t *testing.T) {
-	//check del element
 	t.Run("Expect method to delete the first and the only element in the list", func(t *testing.T) {
-		dll, _, _ := prepareList(1)
+		dll := DoublyLinkedList{}
+		dll.Append('r')
 
 		_, err := dll.Delete(0)
 		if err != nil {
@@ -252,23 +194,29 @@ func TestDelete(t *testing.T) {
 		}
 	})
 
-	t.Run("Expect method to delete the first element in the list", func(t *testing.T) {
-		dll, _, _ := prepareList(3)
-		i := 0
-		l2, _ := dll.Get(i + 1)
-
-		_, err := dll.Delete(i)
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
+	t.Run("Expect method to delete the elements in the list on the different positions (at the beginning, in the middle)", func(t *testing.T) {
+		//what val i want to have on position with according index after deletion
+		tests := []testCase{
+			{0, 'b'},
+			{1, 'c'},
+			{2, 'd'},
 		}
-		char, _ := dll.Get(i)
-		if char != l2 {
-			t.Errorf("Expected %c, got %c", l2, char)
+		for _, test := range tests {
+			dll := prepareListForDeleteM()
+			_, err := dll.Delete(test.index)
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+			char, _ := dll.Get(test.index)
+			if char != test.val {
+				t.Errorf("Expected %c, got %c", test.val, char)
+			}
 		}
 	})
 
-	t.Run("Expect method to delete the last element in the list", func(t *testing.T) {
-		dll, _, _ := prepareList(3)
+	//del?
+	t.Run("Expect method to delete the elements in the list on the different positions (at the end)", func(t *testing.T) {
+		dll := prepareListForDeleteM()
 		l2, _ := dll.Get(dll.Lenght() - 2)
 
 		_, err := dll.Delete(dll.Lenght() - 1)
@@ -281,73 +229,47 @@ func TestDelete(t *testing.T) {
 		}
 	})
 
-	t.Run("Expect method to delete middle element in the list", func(t *testing.T) {
-		dll, _, _ := prepareList(3)
-		i := 1
-		l3, _ := dll.Get(i + 1)
-
-		_, err := dll.Delete(i)
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
-		char, _ := dll.Get(i)
-		if char != l3 {
-			t.Errorf("Expected %c, got %c", l3, char)
-		}
-	})
-
 	t.Run("Expect method to return an error for an empty list", func(t *testing.T) {
-		dll, _, _ := prepareList(0)
+		dll := DoublyLinkedList{}
 		_, err := dll.Delete(0)
 		if err == nil {
 			t.Errorf("Expected method to return an error, got %v", err)
 		}
 	})
 
-	//return check
-	t.Run("Expect method to return deleted element", func(t *testing.T) {
-		dll, _, _ := prepareList(4)
-		l1, _ := dll.Get(0)
-		l2, _ := dll.Get(1)
-		l3, _ := dll.Get(2)
-		l4, _ := dll.Get(3)
-
-		rL2, err := dll.Delete(1)
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
+	t.Run("Expect method to return deleted element (del at the begining, in the middle, at the end)", func(t *testing.T) {
+		tests := []testCase{
+			{0, 'a'},
+			{1, 'b'},
+			{3, 'd'},
 		}
-		if rL2 != l2 {
-			t.Errorf("in the middle \nExpected %c, got %c", l2, rL2)
-		}
-
-		rL1, err := dll.Delete(0)
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
-		if rL1 != l1 {
-			t.Errorf("at the begining \nExpected %c, got %c", l1, rL1)
-		}
-
-		rL4, err := dll.Delete(1)
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
-		if rL4 != l4 {
-			t.Errorf("at the end \nExpected %c, got %c", l4, rL4)
-		}
-
-		rL3, err := dll.Delete(0)
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
-		if rL3 != l3 {
-			t.Errorf("the only one \nExpected %c, got %c", l3, rL3)
+		for _, test := range tests {
+			dll := prepareListForDeleteM()
+			l, err := dll.Delete(test.index)
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+			if l != test.val {
+				t.Errorf("Expected %c, got %c", test.val, l)
+			}
 		}
 	})
 
-	//index check
+	t.Run("Expect method to return deleted element (the only one element in the list)", func(t *testing.T) {
+		dll := DoublyLinkedList{}
+		l := 'p'
+		dll.Append(l)
+		char, err := dll.Delete(0)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if char != l {
+			t.Errorf("Expected %c, got %c", l, char)
+		}
+	})
+
 	t.Run("Expect method to return an error for wrong index argument: index < 0", func(t *testing.T) {
-		dll, _, _ := prepareList(1)
+		dll := prepareListForDeleteM()
 		_, err := dll.Delete(-1)
 		if err == nil {
 			t.Errorf("Expected method to return an error, got %v", err)
@@ -355,57 +277,26 @@ func TestDelete(t *testing.T) {
 	})
 
 	t.Run("Expect method to return an error for wrong index argument: index >= size of the list", func(t *testing.T) {
-		dll, _, _ := prepareList(1)
-		_, err := dll.Delete(2)
-		if err == nil {
-			t.Errorf("Expected method to return an error, got %v", err)
-		}
-
-		_, err = dll.Delete(1)
+		dll := prepareListForDeleteM()
+		_, err := dll.Delete(dll.Lenght())
 		if err == nil {
 			t.Errorf("Expected method to return an error, got %v", err)
 		}
 	})
 
-	//size check
 	t.Run("Expect size of the non-empty list to decrease by 1 after deleting the element", func(t *testing.T) {
-		size := 4
-		dll, _, _ := prepareList(size)
+		dll := prepareListForDeleteM()
 
-		_, err := dll.Delete(1)
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
-		size--
-		if dll.Lenght() != size {
-			t.Errorf("in the middle\nExpected size: %v, got %v", size, dll.Lenght())
-		}
-
-		_, err = dll.Delete(0)
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
-		size--
-		if dll.Lenght() != size {
-			t.Errorf("at the begining\nExpected size: %v, got %v", size, dll.Lenght())
-		}
-
-		_, err = dll.Delete(size - 1)
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
-		size--
-		if dll.Lenght() != size {
-			t.Errorf("at the end\nExpected size: %v, got %v", size, dll.Lenght())
-		}
-
-		_, err = dll.Delete(0)
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
-		size--
-		if dll.Lenght() != size {
-			t.Errorf("the last one\nExpected size: %v, got %v", size, dll.Lenght())
+		indexes := []int{3, 1, 0, 0}
+		for _, index := range indexes {
+			size := dll.Lenght()
+			_, err := dll.Delete(index)
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+			if dll.Lenght() != size-1 {
+				t.Errorf("Expected size: %v, got %v", size-1, dll.Lenght())
+			}
 		}
 	})
 
@@ -425,7 +316,6 @@ func prepareListForDeleteAllM() DoublyLinkedList {
 	return dll
 }
 func TestDeleteAll(t *testing.T) {
-	// del element check
 	t.Run("Expect method to delete all elements from the list that are equal to the argument", func(t *testing.T) {
 		dll := prepareListForDeleteAllM()
 		l := 'a'
@@ -434,8 +324,7 @@ func TestDeleteAll(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 
-		count := dll.Lenght()
-		for i := 0; i < count; i++ {
+		for i := 0; i < dll.Lenght(); i++ {
 			char, _ := dll.Get(i)
 			if char == l {
 				t.Fail()
@@ -443,7 +332,6 @@ func TestDeleteAll(t *testing.T) {
 		}
 	})
 
-	// no element in list
 	t.Run("Expect method to do nothing if there no elements in the list that are equal to the argument", func(t *testing.T) {
 		dll1 := prepareListForDeleteAllM()
 		dll2 := prepareListForDeleteAllM()
@@ -466,7 +354,7 @@ func TestDeleteAll(t *testing.T) {
 			}
 		}
 	})
-	// input check
+
 	t.Run("Expect method to return an error for non-letter arguments", func(t *testing.T) {
 		dll := DoublyLinkedList{}
 		err := dll.DeleteAll('1')
@@ -475,10 +363,9 @@ func TestDeleteAll(t *testing.T) {
 		}
 	})
 
-	// size check
 	t.Run("Expect the size of the list to decrease by the number of the deleted elements", func(t *testing.T) {
 		dll := prepareListForDeleteAllM()
-		// number of the l elements = 4
+		// number of the 'a' = 4
 		oldLen := dll.Lenght()
 		l := 'a'
 		err := dll.DeleteAll(l)
@@ -511,10 +398,7 @@ func TestGet(t *testing.T) {
 	// check returned element
 	t.Run("Expect method to return element of the list at a particular index", func(t *testing.T) {
 		dll := prepareListForGetM()
-		tests := []struct {
-			index int
-			val   rune
-		}{
+		tests := []testCase{
 			{0, 'a'},
 			{2, 'q'},
 			{7, 'l'},
@@ -531,7 +415,6 @@ func TestGet(t *testing.T) {
 		}
 	})
 
-	//index check
 	t.Run("Expect method to return an error for an empty list", func(t *testing.T) {
 		dll := DoublyLinkedList{}
 		_, err := dll.Get(0)
@@ -557,18 +440,13 @@ func TestGet(t *testing.T) {
 	})
 }
 
-func prepareList3() DoublyLinkedList {
-	dll := DoublyLinkedList{}
-	dll.Append('a')
-	dll.Append('b')
-	dll.Append('c')
-	dll.Append('d')
-	return dll
-}
 func TestClone(t *testing.T) {
-	//check if they equal
 	t.Run("Expect method to return copy of the  list", func(t *testing.T) {
-		dll := prepareList3()
+		dll := DoublyLinkedList{}
+		dll.Append('a')
+		dll.Append('b')
+		dll.Append('c')
+		dll.Append('c')
 		cloneDll := dll.Clone()
 
 		if dll.Lenght() != cloneDll.Lenght() {
@@ -585,7 +463,6 @@ func TestClone(t *testing.T) {
 		}
 	})
 
-	//check if they are not the same
 	t.Run("Expect method to return an independant list ", func(t *testing.T) {
 		dll := DoublyLinkedList{}
 		cloneDll := dll.Clone()
@@ -611,10 +488,18 @@ func TestClone(t *testing.T) {
 	})
 }
 
+func prepareListForReverseM() DoublyLinkedList {
+	dll := DoublyLinkedList{}
+	dll.Append('k')
+	dll.Append('t')
+	dll.Append('c')
+	dll.Append('v')
+	return dll
+}
 func TestReverse(t *testing.T) {
 	t.Run("Expect method to reverse list ", func(t *testing.T) {
-		dll := prepareList3()
-		sameDll := prepareList3()
+		dll := prepareListForReverseM()
+		sameDll := prepareListForReverseM()
 
 		dll.Reverse()
 		if dll.Lenght() != sameDll.Lenght() {
@@ -659,7 +544,7 @@ func TestReverse(t *testing.T) {
 	})
 }
 
-func prepareList4() DoublyLinkedList {
+func prepareListFindM() DoublyLinkedList {
 	dll := DoublyLinkedList{}
 	dll.Append('a')
 	dll.Append('b')
@@ -672,18 +557,14 @@ func prepareList4() DoublyLinkedList {
 	return dll
 }
 func TestFindFirst(t *testing.T) {
-	//find element
 	t.Run("Expect method to return index of the first found (start - head) element that matches argument", func(t *testing.T) {
-		dll := prepareList4()
-		tests := []struct {
-			val   rune
-			index int
-		}{
-			{'a', 0},
-			{'b', 1},
-			{'q', 2},
-			{'x', 4},
-			{'j', 5},
+		dll := prepareListFindM()
+		tests := []testCase{
+			{0, 'a'},
+			{1, 'b'},
+			{2, 'q'},
+			{4, 'x'},
+			{5, 'j'},
 		}
 
 		for _, test := range tests {
@@ -696,10 +577,9 @@ func TestFindFirst(t *testing.T) {
 			}
 		}
 	})
-	//not find element
-	t.Run("Expect method to return -1 if there no such element in the list", func(t *testing.T) {
-		dll := prepareList4()
 
+	t.Run("Expect method to return -1 if there no such element in the list", func(t *testing.T) {
+		dll := prepareListFindM()
 		i, err := dll.FindFirst('є')
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
@@ -708,10 +588,9 @@ func TestFindFirst(t *testing.T) {
 			t.Errorf("Expected -1, got %v", i)
 		}
 	})
-	//empty list
+
 	t.Run("Expect method to return -1 if the list is empty", func(t *testing.T) {
 		dll := DoublyLinkedList{}
-
 		i, err := dll.FindFirst('є')
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
@@ -720,31 +599,25 @@ func TestFindFirst(t *testing.T) {
 			t.Errorf("Expected -1, got %v", i)
 		}
 	})
-	//wrong input
+
 	t.Run("Expect method to return an error for non-letter arguments", func(t *testing.T) {
 		dll := DoublyLinkedList{}
-
 		_, err := dll.FindFirst('-')
 		if err == nil {
 			t.Errorf("Expected method to return an error, got %v", err)
 		}
 	})
-
 }
 
 func TestFindLast(t *testing.T) {
-	// find element
 	t.Run("Expect method to return index of the first found (start - tail) element that matches argument", func(t *testing.T) {
-		dll := prepareList4()
-		tests := []struct {
-			val   rune
-			index int
-		}{
-			{'a', 3},
-			{'b', 1},
-			{'q', 7},
-			{'x', 6},
-			{'j', 5},
+		dll := prepareListFindM()
+		tests := []testCase{
+			{3, 'a'},
+			{1, 'b'},
+			{7, 'q'},
+			{6, 'x'},
+			{5, 'j'},
 		}
 
 		for _, test := range tests {
@@ -757,10 +630,9 @@ func TestFindLast(t *testing.T) {
 			}
 		}
 	})
-	// not find element
-	t.Run("Expect method to return -1 if there no such element in the list", func(t *testing.T) {
-		dll := prepareList4()
 
+	t.Run("Expect method to return -1 if there no such element in the list", func(t *testing.T) {
+		dll := prepareListFindM()
 		i, err := dll.FindLast('є')
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
@@ -769,10 +641,9 @@ func TestFindLast(t *testing.T) {
 			t.Errorf("Expected -1, got %v", i)
 		}
 	})
-	// empty list
+
 	t.Run("Expect method to return -1 if the list is empty", func(t *testing.T) {
 		dll := DoublyLinkedList{}
-
 		i, err := dll.FindLast('є')
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
@@ -781,10 +652,9 @@ func TestFindLast(t *testing.T) {
 			t.Errorf("Expected -1, got %v", i)
 		}
 	})
-	// wrong input
+
 	t.Run("Expect method to return an error for non-letter arguments", func(t *testing.T) {
 		dll := DoublyLinkedList{}
-
 		_, err := dll.FindLast('+')
 		if err == nil {
 			t.Errorf("Expected method to return an error, got %v", err)
@@ -792,9 +662,18 @@ func TestFindLast(t *testing.T) {
 	})
 }
 
+func prepareListForClearM() DoublyLinkedList {
+	dll := DoublyLinkedList{}
+	dll.Append('f')
+	dll.Append('u')
+	dll.Append('y')
+	dll.Append('k')
+	return dll
+}
+
 func TestClear(t *testing.T) {
 	t.Run("Expect method to delete all elements from the list", func(t *testing.T) {
-		dll := prepareList4()
+		dll := prepareListForClearM()
 		dll.Clear()
 		_, err := dll.Get(0)
 		if err == nil {
@@ -803,7 +682,7 @@ func TestClear(t *testing.T) {
 	})
 
 	t.Run("Expect method to decrease size of the list to 0", func(t *testing.T) {
-		dll := prepareList4()
+		dll := prepareListForClearM()
 		dll.Clear()
 		if dll.Lenght() != 0 {
 			t.Errorf("Expected 0, got %v", dll.Lenght())
@@ -839,10 +718,7 @@ func TestExtend(t *testing.T) {
 		dll1, dll2 := prepareListsForExtendM()
 		dll1.Extend(dll2)
 
-		tests := []struct {
-			index int
-			val   rune
-		}{
+		tests := []testCase{
 			{3, 'я'},
 			{4, 'ю'},
 			{5, 'є'},
