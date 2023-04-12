@@ -1,6 +1,6 @@
 # doubly-linked-list
 ---
-About the app
+Implementation of the doubly-linked-list structure.  
 
 ## Variant
 Номер заліковки - 1209 =>  
@@ -8,15 +8,29 @@ About the app
 Номер варіанту= 1
 
 ## Installation
+
+## Usage
+To be able to use this code you need to install Go.  
+How to do it you can see [here](https://go.dev/doc/install)  
+
 ```bash
 $ git clone https://github.com/neliudochka/doubly-linked-list.git
 $ cd doubly-linked-list/
 ```
 
-## Usage
+There is an example of the code with doubly-linked-list struct in the cmd/main/main.go  
+To run it type:  
+```bash
+$ go run cmd/main/main.go
+```
 
 ## Testing
-
+To run tests type:  
+```bash
+$ go test
+```
 ## Commit with failed tests
+[Link](https://github.com/neliudochka/doubly-linked-list/commit/367bb0fc5e7e7b26e7166312d8afcb908761dd7e)
 
 ## Conclusion
+Це був мій перший досвід у написанні тестів і, мабуть, через це я витратила на все це дуже багато часу. Тим не менш, під час написання тестів я виявила кілька варіянтів подій, про які не подумала, коли прописувала методи. Коли я переписувала лист з використанням слайсів, то було дуже зручно не перевіряти все ручками, а запукати тести. Отже, тепер вже з практичного досвіду можу сказати, що тести штука корисна, особливо якщо немає обмеження по часу.
