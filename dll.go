@@ -230,7 +230,7 @@ func (dll *DoublyLinkedList) FindFirst(element rune) (int, error) {
 		count++
 		currentNode = currentNode.next
 	}
-	return -1, nil
+	return 0, nil
 }
 
 // Шукає переданий елемент з хвоста списку. Повертає перший знайдений, що дорівнює шуканому, та повертає його позицію.
