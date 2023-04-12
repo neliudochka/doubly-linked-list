@@ -2,6 +2,7 @@ package dll
 
 import (
 	"fmt"
+	"unicode"
 )
 
 type Node struct {
@@ -47,6 +48,9 @@ func (dll *DoublyLinkedList) Lenght() int {
 
 // Додає елемент у кінець списку
 func (dll *DoublyLinkedList) Append(element rune) error {
+	if !unicode.IsLetter(element) {
+		return fmt.Errorf("Append error: non-letter argument")
+	}
 	var newNode = Node{value: element}
 	if dll.head == nil {
 		dll.head = &newNode
@@ -64,16 +68,28 @@ func (dll *DoublyLinkedList) Append(element rune) error {
 // У випадку передачі некоректного значення позиції
 // (наприклад, від’ємне число, або число, більше за кількість елементів у списку) генерує виключну ситуацію
 func (dll *DoublyLinkedList) Insert(element rune, index int) error {
+	if !unicode.IsLetter(element) {
+		return fmt.Errorf("Insert error: non-letter argument")
+	}
 	switch {
 	case index < 0:
-		fmt.Println("Error: index < 0")
-	case index >= dll.size:
-		fmt.Printf("Error: index > кількість елементів у списку (%v)", dll.size)
+		return fmt.Errorf("Insert error: index < 0")
+	case index > dll.size:
+		return fmt.Errorf(" Insert error: index > last index of the element in the list + 1")
 	case index == 0:
-		newNode := Node{value: element, next: dll.head}
-		dll.head.prev = &newNode
-		dll.head = &newNode
-		dll.size++
+		newNode := Node{value: element}
+		if dll.size == 0 {
+			dll.head = &newNode
+			dll.tail = &newNode
+		} else {
+			dll.head.prev = &newNode
+			newNode.next = dll.head
+			dll.head = &newNode
+		}
+	case index == dll.size:
+		newNode := Node{value: element, prev: dll.tail}
+		dll.tail.next = &newNode
+		dll.tail = &newNode
 	default:
 		nextNode := dll.head
 		for count := 0; count != index; count++ {
@@ -83,8 +99,8 @@ func (dll *DoublyLinkedList) Insert(element rune, index int) error {
 		newNode := Node{value: element, prev: prevNode, next: nextNode}
 		prevNode.next = &newNode
 		nextNode.prev = &newNode
-		dll.size++
 	}
+	dll.size++
 	return nil
 }
 
@@ -93,29 +109,26 @@ func (dll *DoublyLinkedList) Insert(element rune, index int) error {
 // У випадку передачі некоректного значення позиції
 // (наприклад, від’ємне число, або число, більше за індекс останнього елементу списку) метод повинен генерувати виключну ситуацію
 func (dll *DoublyLinkedList) Delete(index int) (rune, error) {
+	var element rune = 0
 	switch {
+	case dll.size == 0:
+		return 0, fmt.Errorf("Delete error: list is empty")
 	case index < 0:
-		fmt.Println("Error: index < 0")
+		return 0, fmt.Errorf("Delete error: index < 0")
 	case index >= dll.size:
-		fmt.Printf("Error: index > кількість елементів у списку (%v)", dll.size)
+		return 0, fmt.Errorf("Delete error: index > index of the last element in the list")
 	case dll.size == 1:
-		element := dll.head.value
+		element = dll.head.value
 		dll.head = nil
 		dll.tail = nil
-		dll.size--
-		return element, nil
 	case index == 0:
-		element := dll.head.value
+		element = dll.head.value
 		dll.head = dll.head.next
 		dll.head.prev = nil
-		dll.size--
-		return element, nil
 	case index == dll.size-1:
-		element := dll.tail.value
+		element = dll.tail.value
 		dll.tail = dll.tail.prev
 		dll.tail.next = nil
-		dll.size--
-		return element, nil
 	default:
 		delNode := dll.head
 		for count := 0; count != index; count++ {
@@ -123,21 +136,27 @@ func (dll *DoublyLinkedList) Delete(index int) (rune, error) {
 		}
 		delNode.prev.next = delNode.next
 		delNode.next.prev = delNode.prev
-		dll.size--
-		return delNode.value, nil
+		element = delNode.value
 	}
-	return 0, nil
+	dll.size--
+	return element, nil
 }
 
 // Видаляєя зі списку усі елементи, які за значенням відповідають переданому.
 // У випадку передачі елемента, який у списку відсутній, жодні зміни до списку не застосовуються.
 func (dll *DoublyLinkedList) DeleteAll(element rune) error {
+	if !unicode.IsLetter(element) {
+		return fmt.Errorf("DeleteAll error: non-letter argument")
+	}
 	currentNode := dll.head
 	count := 0
 	for currentNode != nil {
 		nextNode := currentNode.next
 		if currentNode.value == element {
-			dll.Delete(count)
+			_, err := dll.Delete(count)
+			if err != nil {
+				return fmt.Errorf("DeleteAll error: %v", err)
+			}
 		} else {
 			count++
 		}
@@ -151,10 +170,12 @@ func (dll *DoublyLinkedList) DeleteAll(element rune) error {
 // (наприклад, від’ємне число, або число, більше за індекс останнього елементу списку) метод повинен генерувати виключну ситуацію
 func (dll *DoublyLinkedList) Get(index int) (rune, error) {
 	switch {
+	case dll.size == 0:
+		return 0, fmt.Errorf("Get error: list is empty")
 	case index < 0:
-		fmt.Println("Error: index < 0")
+		return 0, fmt.Errorf("Get error: index < 0")
 	case index >= dll.size:
-		fmt.Printf("Error: index > кількість елементів у списку (%v)", dll.size)
+		return 0, fmt.Errorf("Get error: index >= size of the list")
 	default:
 		currentNode := dll.head
 		for count := 0; count != index; count++ {
@@ -162,23 +183,22 @@ func (dll *DoublyLinkedList) Get(index int) (rune, error) {
 		}
 		return currentNode.value, nil
 	}
-	return 0, nil
 }
 
 // Копіює поточний список та повертає його копію.
-func (dll *DoublyLinkedList) Clone() (DoublyLinkedList, error) {
+func (dll *DoublyLinkedList) Clone() DoublyLinkedList {
 	dll2 := DoublyLinkedList{}
 	currentNode := dll.head
 	for currentNode != nil {
 		dll2.Append(currentNode.value)
 		currentNode = currentNode.next
 	}
-	return dll2, nil
+	return dll2
 }
 
 // Змінює порядок елементів у поточному списку задом наперед.
 // Елемент, що був останнім стане першим, передостаннім — другим, … а перший — останнім.
-func (dll *DoublyLinkedList) Reverse() error {
+func (dll *DoublyLinkedList) Reverse() {
 	switch {
 	case dll.size > 1:
 		//tailNode := dll.tail
@@ -192,17 +212,15 @@ func (dll *DoublyLinkedList) Reverse() error {
 		oldHeadNode := dll.head
 		dll.head = dll.tail
 		dll.tail = oldHeadNode
-	case dll.size == 1:
-		fmt.Println("only one element, so list won't change its structure")
-	default:
-		fmt.Println("List is empty!")
 	}
-	return nil
 }
 
 // Шукає переданий елемент з голови списку. Повертає перший знайдений, що дорівнює шуканому, та повертає його позицію.
 // У випадку відсутності шуканого елемента у списку, метод повертає -1
 func (dll *DoublyLinkedList) FindFirst(element rune) (int, error) {
+	if !unicode.IsLetter(element) {
+		return -1, fmt.Errorf("FindFirst error: non-letter argument")
+	}
 	currentNode := dll.head
 	count := 0
 	for currentNode != nil {
@@ -218,6 +236,9 @@ func (dll *DoublyLinkedList) FindFirst(element rune) (int, error) {
 // Шукає переданий елемент з хвоста списку. Повертає перший знайдений, що дорівнює шуканому, та повертає його позицію.
 // У випадку відсутності шуканого елемента у списку, метод повертає -1
 func (dll *DoublyLinkedList) FindLast(element rune) (int, error) {
+	if !unicode.IsLetter(element) {
+		return -1, fmt.Errorf("FindLast error: non-letter argument")
+	}
 	currentNode := dll.tail
 	count := dll.size - 1
 	for currentNode != nil {
@@ -231,26 +252,29 @@ func (dll *DoublyLinkedList) FindLast(element rune) (int, error) {
 }
 
 // Видаляє усі елементи списку.
-func (dll *DoublyLinkedList) Clear() error {
+func (dll *DoublyLinkedList) Clear() {
 	if dll.size > 0 {
 		dll.head = nil
 		dll.tail = nil
 		dll.size = 0
-	} else {
-		fmt.Println("List is empty!")
 	}
-	return nil
 }
 
 // Розширює список.
 // Приймає інший список та додає до поточного списку усі елементи останнього.
 // При цьому подальші зміни в другий список не впливають на перший.
-func (dll *DoublyLinkedList) Extend(dll2 DoublyLinkedList) error {
-	newDll, _ := dll2.Clone()
-	fmt.Println("clone:")
-	newDll.PrintAll()
-	dll.tail.next = newDll.head
-	newDll.head.prev = dll.tail
-	dll.tail = newDll.tail
-	return nil
+func (dll *DoublyLinkedList) Extend(dll2 DoublyLinkedList) {
+	switch {
+	case dll2.size == 0:
+	case dll.size == 0:
+		newDll := dll2.Clone()
+		dll = &newDll
+		dll.size += newDll.size
+	default:
+		newDll := dll2.Clone()
+		dll.tail.next = newDll.head
+		newDll.head.prev = dll.tail
+		dll.tail = newDll.tail
+		dll.size += dll2.size
+	}
 }
