@@ -7,36 +7,58 @@ import (
 )
 
 func main() {
-	ddl2 := dll.DoublyLinkedList{}
+	dll2 := dll.DoublyLinkedList{}
 
-	err := ddl2.Append('1')
-	if err != nil {
-		fmt.Println(err.Error())
-	}
+	fmt.Println("list:")
+	dll2.Append('a')
+	dll2.Append('a')
+	dll2.Insert('m', 1)
+	dll2.Insert('f', 3)
+	dll2.Insert('p', 0)
+	dll2.Append('і')
+	dll2.Insert('я', 0)
+	dll2.PrintAll()
+	fmt.Println("lenght:", dll2.Lenght())
 
-	ddl2.Insert('5', 2)
-	err = ddl2.Insert('m', 3)
-	if err != nil {
-		fmt.Println(err.Error())
-	}
-	ddl2.Insert('3', 0)
-	ddl2.Insert('4', 1)
+	el, _ := dll2.Delete(3)
+	fmt.Printf("\ndeleted element '%c' with index 3 :\n", el)
+	dll2.PrintAll()
 
-	ddl2.PrintAll()
-	fmt.Println("len: ", ddl2.Lenght())
+	fmt.Println("\ndeleted all 'a' elements :")
+	dll2.DeleteAll('a')
+	dll2.PrintAll()
 
-	ddl3 := ddl2.Clone()
+	fmt.Println("\nget element with index 1 :")
+	el, _ = dll2.Get(1)
+	fmt.Printf("get: %c\n", el)
 
-	ddl3.Append('y')
+	fmt.Println("\ncloned the list and reversed it :")
+	dll3 := dll2.Clone()
+	dll3.Reverse()
+	fmt.Println("dll2 (the original) list: ")
+	dll2.PrintAll()
+	fmt.Println("\ndll3 (copied and reversed) list: ")
+	dll3.PrintAll()
 
-	ddl3.Reverse()
-	ddl3.Insert('y', 0)
-	ddl3.PrintAll()
+	el = 'f'
+	i, _ := dll2.FindFirst(el)
+	fmt.Printf("\nfound first element %c in the dll2 list on the %v index\n", el, i)
+	i, _ = dll3.FindLast(el)
+	fmt.Printf("found last element %c in the dll3 list on the %v index\n", el, i)
 
-	ddl2.Extend(ddl3)
-	ddl2.PrintAll()
-	fmt.Println("len: ", ddl2.Lenght())
-	ddl2.PrintAll()
+	fmt.Println("\ncleared dll2 list :")
+	dll2.Clear()
+	dll2.PrintAll()
 
-	//fmt.Printf("clone: %p %p\n", &ddl2, &ddl3)
+	fmt.Println("\nextended dll3 with dll4 list :")
+	fmt.Println("dll4 list:")
+	dll4 := dll.DoublyLinkedList{}
+	dll4.Append('t')
+	dll4.Append('w')
+	dll4.Append('o')
+	dll4.PrintAll()
+
+	fmt.Println("\nextended dll3 list:")
+	dll3.Extend(dll4)
+	dll3.PrintAll()
 }
