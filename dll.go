@@ -87,7 +87,9 @@ func (dll *DoublyLinkedList) DeleteAll(element rune) error {
 		return fmt.Errorf("DeleteAll error: non-letter argument")
 	}
 	index := 0
-	for j := 0; j < len(dll.elements); j++ {
+	len := len(dll.elements)
+	for j := 0; j < len; j++ {
+		fmt.Println(index, j)
 		if dll.elements[index] == element {
 			_, err := dll.Delete(index)
 			if err != nil {
