@@ -89,7 +89,6 @@ func (dll *DoublyLinkedList) DeleteAll(element rune) error {
 	index := 0
 	len := len(dll.elements)
 	for j := 0; j < len; j++ {
-		fmt.Println(index, j)
 		if dll.elements[index] == element {
 			_, err := dll.Delete(index)
 			if err != nil {
